@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watchEffect } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import AsciiTurkey from "./components/AsciiTurkey.vue";
 import FallingWord from "./components/FallingWord.vue";
 import GameOverDialog from "./components/GameOverDialog.vue";
@@ -66,9 +66,12 @@ const startInterval = () => {
   }, wordInterval.value);
 };
 
-const restartGame = () => {
+const restartGame = async () => {
   currentWords.value = [];
   typedWords.value = [];
+  gameOver.value = true;
+
+  await nextTick();
   score.value = 0;
   turkeyFlipped.value = false;
   gameOver.value = false;
@@ -152,6 +155,7 @@ onMounted(() => {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  z-index: 10;
 }
 
 .words-container {
