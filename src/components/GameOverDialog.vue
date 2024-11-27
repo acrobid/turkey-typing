@@ -2,6 +2,7 @@
 defineProps<{
   score: number;
   wordsTyped: string[];
+  activeWord: string;
 }>();
 
 const emit = defineEmits<{
@@ -9,10 +10,12 @@ const emit = defineEmits<{
 }>();
 
 const handleRestart = () => {
-  emit('restart');
+  emit("restart");
   // Use nextTick to ensure the game container is ready after state updates
   setTimeout(() => {
-    const gameContainer = document.querySelector('.game-container') as HTMLElement;
+    const gameContainer = document.querySelector(
+      ".game-container",
+    ) as HTMLElement;
     if (gameContainer) {
       gameContainer.focus();
     }
@@ -23,7 +26,7 @@ const handleRestart = () => {
 <template>
   <div class="dialog-overlay">
     <div class="dialog">
-      <h2>Game Over!</h2>
+      <h2>{{ activeWord }} killed the turkey!</h2>
       <p>Score: {{ score }}</p>
       <div class="words-typed">
         <h3>Words Typed:</h3>
@@ -64,7 +67,7 @@ const handleRestart = () => {
 }
 
 button {
-  background: #4CAF50;
+  background: #4caf50;
   color: white;
   border: none;
   padding: 0.5rem 1rem;

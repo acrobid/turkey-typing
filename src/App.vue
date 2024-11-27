@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import AsciiTurkey from './components/AsciiTurkey.vue';
-import FallingWord from './components/FallingWord.vue';
-import GameOverDialog from './components/GameOverDialog.vue';
-import { getRandomWord } from './utils/words';
+import { ref, computed, onMounted, watchEffect } from "vue";
+import AsciiTurkey from "./components/AsciiTurkey.vue";
+import FallingWord from "./components/FallingWord.vue";
+import GameOverDialog from "./components/GameOverDialog.vue";
+import { getRandomWord } from "./utils/words";
 
 const gameOver = ref(false);
-const currentWords = ref<Array<{ id: number; word: string; typedLetters: number }>>([]);
+const currentWords = ref<
+  Array<{ id: number; word: string; typedLetters: number }>
+>([]);
 const typedWords = ref<string[]>([]);
 const score = ref(0);
 const nextWordId = ref(0);
@@ -16,32 +18,52 @@ const addWord = () => {
   currentWords.value.push({
     id: nextWordId.value++,
     word: getRandomWord(),
-    typedLetters: 0
+    typedLetters: 0,
   });
 };
 
 const handleKeyPress = (event: KeyboardEvent) => {
   if (gameOver.value) return;
-  
+
   const activeWord = currentWords.value[0];
   if (!activeWord) return;
-  
+
   if (event.key === activeWord.word[activeWord.typedLetters]) {
     activeWord.typedLetters++;
-    
+
     if (activeWord.typedLetters === activeWord.word.length) {
       score.value += activeWord.word.length;
       typedWords.value.push(activeWord.word);
       currentWords.value.shift();
-      addWord();
+      if (currentWords.value.length === 0) addWord();
+      startInterval();
     }
   }
 };
 
 const handleWordMissed = () => {
   turkeyFlipped.value = true;
-  setTimeout(()=>
-  gameOver.value = true, 2000)
+  setTimeout(() => (gameOver.value = true), 2000);
+};
+
+let wordInterval = ref(5000);
+setInterval(() => {
+  updateWordInterval();
+}, 1000);
+
+const updateWordInterval = () => {
+  wordInterval.value = Math.max(400, wordInterval.value - 100);
+};
+
+let intervalId: number;
+
+const startInterval = () => {
+  clearInterval(intervalId);
+  intervalId = setInterval(() => {
+    if (!gameOver.value) {
+      addWord();
+    }
+  }, wordInterval.value);
 };
 
 const restartGame = () => {
@@ -51,26 +73,23 @@ const restartGame = () => {
   turkeyFlipped.value = false;
   gameOver.value = false;
   nextWordId.value = 0;
+  wordInterval.value = 5000;
   addWord();
+  startInterval();
 };
 
-// Start game
-addWord();
-
-// Add word every 5 seconds
-setInterval(() => {
-  if (!gameOver.value && currentWords.value.length < 5) {
-    addWord();
-  }
-}, 5000);
+onMounted(() => {
+  addWord();
+  startInterval();
+});
 </script>
 
 <template>
   <div class="game-container" @keydown="handleKeyPress" tabindex="0" autofocus>
     <div class="score">Score: {{ score }}</div>
-    
+    <button class="new-game-button" @click="restartGame">New Game</button>
     <div class="game-area">
-      <div class="words-container">
+      <div class="words-container" v-if="!gameOver">
         <FallingWord
           v-for="(word, index) in currentWords"
           :key="word.id"
@@ -81,16 +100,17 @@ setInterval(() => {
           @word-missed="handleWordMissed"
         />
       </div>
-      
+
       <div class="turkey-container">
         <AsciiTurkey :is-flipped="turkeyFlipped" />
       </div>
     </div>
-    
+
     <GameOverDialog
       v-if="gameOver"
       :score="score"
       :words-typed="typedWords"
+      :active-word="currentWords[0]?.word"
       @restart="restartGame"
     />
   </div>
@@ -120,6 +140,18 @@ setInterval(() => {
   font-size: 24px;
   font-weight: bold;
   z-index: 10;
+}
+
+.new-game-button {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .words-container {
