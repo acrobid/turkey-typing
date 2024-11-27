@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTemplateRef } from "vue";
 defineProps<{
   score: number;
   wordsTyped: string[];
@@ -20,11 +21,31 @@ const handleRestart = () => {
       gameContainer.focus();
     }
   }, 0);
+  closeDialog();
 };
+
+const dialogRef = useTemplateRef("dialogRef");
+
+const closeDialog = () => {
+  if (dialogRef.value) {
+    dialogRef.value.close();
+  }
+};
+
+const openDialog = () => {
+  if (dialogRef.value) {
+    dialogRef.value.showModal();
+  }
+};
+
+defineExpose({
+  openDialog,
+  closeDialog,
+});
 </script>
 
 <template>
-  <div class="dialog-overlay">
+  <dialog ref="dialogRef" class="dialog-overlay modal">
     <div class="dialog">
       <h2>{{ activeWord }} killed the turkey!</h2>
       <p>Score: {{ score }}</p>
@@ -36,22 +57,10 @@ const handleRestart = () => {
       </div>
       <button @click="handleRestart">Play Again</button>
     </div>
-  </div>
+  </dialog>
 </template>
 
 <style scoped>
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .dialog {
   background: #fff;
   padding: 2rem;
@@ -67,7 +76,7 @@ const handleRestart = () => {
 }
 
 button {
-  background: #4caf50;
+  background: #ff8c00;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -76,6 +85,52 @@ button {
 }
 
 button:hover {
-  background: #45a049;
+  background: #a09a45;
+}
+
+button:click {
+  background: #9c782b;
+}
+
+.modal {
+  display: none;
+  transition-property: display, opacity;
+  transition-behavior: allow-discrete;
+  transition-duration: 0.3s;
+
+  opacity: 0;
+  background: white;
+  color: #213547;
+}
+
+.modal[open] {
+  display: block;
+  @starting-style {
+    opacity: 0;
+  }
+  opacity: 1;
+}
+
+.modal[open]::backdrop {
+  display: none;
+  /* background: rgba(0, 0, 0, 0.5); */
+}
+
+.modal {
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  margin: 0 auto;
+  overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
 }
 </style>

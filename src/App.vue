@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, useTemplateRef } from "vue";
 import AsciiTurkey from "./components/AsciiTurkey.vue";
 import FallingWord from "./components/FallingWord.vue";
 import GameOverDialog from "./components/GameOverDialog.vue";
@@ -43,7 +43,10 @@ const handleKeyPress = (event: KeyboardEvent) => {
 
 const handleWordMissed = () => {
   turkeyFlipped.value = true;
-  setTimeout(() => (gameOver.value = true), 2000);
+  setTimeout(() => {
+    gameOver.value = true;
+    openDialog();
+  }, 2000);
 };
 
 let wordInterval = ref(5000);
@@ -67,6 +70,8 @@ const startInterval = () => {
 };
 
 const restartGame = async () => {
+  // wait 0.3 seconds
+  await new Promise((resolve) => setTimeout(resolve, 300));
   currentWords.value = [];
   typedWords.value = [];
   gameOver.value = true;
@@ -85,6 +90,14 @@ onMounted(() => {
   addWord();
   startInterval();
 });
+
+const dialogRef = useTemplateRef("dialogRef");
+
+function openDialog() {
+  if (!dialogRef.value) return;
+
+  dialogRef.value.openDialog();
+}
 </script>
 
 <template>
@@ -110,7 +123,7 @@ onMounted(() => {
     </div>
 
     <GameOverDialog
-      v-if="gameOver"
+      ref="dialogRef"
       :score="score"
       :words-typed="typedWords"
       :active-word="currentWords[0]?.word"
@@ -147,9 +160,9 @@ onMounted(() => {
 
 .new-game-button {
   position: absolute;
-  top: 0%;
-  left: 0%;
-  background: #4caf50;
+  top: 20px;
+  left: 20px;
+  background: #ff8c00;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
