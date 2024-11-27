@@ -1,5 +1,15 @@
-# Vue 3 + TypeScript + Vite
+# Turkey Typing Game
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Turkey Typing is a fun and interactive game built with Vue 3, TypeScript, and Vite. The objective of the game is to type the falling words correctly before they reach the bottom of the screen. The game gets progressively harder as the words fall faster over time.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Features
+
+- **Falling Words**: Words fall from the top of the screen, and the player must type them correctly.
+- **Score Tracking**: The player's score increases based on the length of the words typed correctly.
+- **Game Over**: The game ends if a word reaches the bottom of the screen.
+- **Restart Game**: Players can restart the game at any time.
+- **Ascii Turkey**: A fun turkey animation that flips when a word is missed.
+
+## Project Setup
+
+1. **Clone the repository**:
