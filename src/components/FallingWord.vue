@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { gsap } from 'gsap';
+import { ref, onMounted } from "vue";
 
-const props = defineProps<{
+defineProps<{
   word: string;
   typedLetters: number;
   speed: number;
@@ -14,41 +13,29 @@ const emit = defineEmits<{
 }>();
 
 const wordElement = ref<HTMLDivElement | null>(null);
-let animation: gsap.core.Tween;
 
 onMounted(() => {
   if (wordElement.value) {
     const startX = Math.random() * (window.innerWidth - 200);
     wordElement.value.style.left = `${startX}px`;
-    wordElement.value.style.transform = 'translateY(0)';
-    
-    animation = gsap.fromTo(wordElement.value,
-      { y: 0 },
-      {
-        y: window.innerHeight - 150,
-        duration: props.speed,
-        ease: 'none',
-        onComplete: () => emit('wordMissed')
-      }
-    );
-  }
-});
-
-onUnmounted(() => {
-  if (animation) {
-    animation.kill();
   }
 });
 </script>
 
 <template>
-  <div ref="wordElement" class="falling-word" :class="{ 'active-word': isActive }">
+  <div
+    ref="wordElement"
+    class="falling-word"
+    :class="{ 'active-word': isActive }"
+    :style="{ animationDuration: `${speed}s` }"
+    @animationend="emit('wordMissed')"
+  >
     <span
       v-for="(letter, index) in word"
-      :key="index"
+      :key="word"
       :class="{
-        'typed': index < typedLetters,
-        'current-letter': index === typedLetters && isActive
+        typed: index < typedLetters,
+        'current-letter': index === typedLetters && isActive,
       }"
     >
       {{ letter }}
@@ -60,13 +47,23 @@ onUnmounted(() => {
 .falling-word {
   position: absolute;
   font-size: 24px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   top: 0;
   white-space: nowrap;
   will-change: transform;
   padding: 4px 8px;
   border-radius: 4px;
   transition: background-color 0.3s;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(100vh - 150px));
+  }
 }
 
 .active-word {
@@ -75,7 +72,7 @@ onUnmounted(() => {
 }
 
 .typed {
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .current-letter {
@@ -83,18 +80,23 @@ onUnmounted(() => {
 }
 
 .current-letter::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #FFA500;
+  background-color: #ffa500;
   animation: blink 1s infinite;
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 </style>

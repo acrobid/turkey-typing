@@ -13,6 +13,7 @@ const typedWords = ref<string[]>([]);
 const score = ref(0);
 const nextWordId = ref(0);
 const turkeyFlipped = ref(false);
+const speed = ref(15);
 
 const addWord = () => {
   currentWords.value.push({
@@ -104,6 +105,19 @@ function openDialog() {
   <div class="game-container" @keydown="handleKeyPress" tabindex="0" autofocus>
     <div class="score">Score: {{ score }}</div>
     <button class="new-game-button" @click="restartGame">New Game</button>
+    <div class="difficulty-input">
+      <label>
+        Level
+        <input
+          v-model="speed"
+          type="number"
+          hint="difficulty level"
+          size="3"
+          maxlength="3"
+          style="width: 50px"
+        />
+      </label>
+    </div>
     <div class="game-area">
       <div class="words-container" v-if="!gameOver">
         <FallingWord
@@ -111,7 +125,7 @@ function openDialog() {
           :key="word.id"
           :word="word.word"
           :typed-letters="word.typedLetters"
-          :speed="15"
+          :speed
           :is-active="index === 0"
           @word-missed="handleWordMissed"
         />
@@ -169,6 +183,34 @@ function openDialog() {
   border-radius: 4px;
   cursor: pointer;
   z-index: 10;
+}
+
+.difficulty-input {
+  position: absolute;
+  top: 20px;
+  transform: translateX(-50%);
+  left: 50%;
+  background: #ff8c00;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 10;
+
+  > label {
+    display: flex;
+    align-items: center;
+
+    > input {
+      margin-left: 0.5rem;
+      background: #ff8c00;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  }
 }
 
 .words-container {

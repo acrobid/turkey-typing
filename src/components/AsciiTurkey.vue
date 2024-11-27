@@ -11,7 +11,6 @@ const leftOrRight = ref("right");
 
 function getRandomInterval(min: number, max: number) {
   const interval = Math.floor(Math.random() * (max - min + 1) + min) * 1000;
-  console.log(interval);
   return interval;
 }
 
